@@ -53,8 +53,17 @@ public class MemberRestController {
   //*****新增AccessToken並存到Redis*****
     private String generateAccessToken(String username) {
         // 定義 JWT 的相關參數
-        String secretKey = "your-secret-key"; // 密鑰，請替換為你自己的密鑰
+        String secretKey = "daio"; // 密鑰，請替換為你自己的密鑰
         long expirationTime = 86400000; // Token 過期時間，這裡設定為一天 (24 小時)
+        
+        // 檢查 Redis 中是否存在相同的 Access Token
+        String redisKey = "access_token:" + username;
+        String storedAccessToken = redisTemplate.opsForValue().get(redisKey);
+        
+        if (storedAccessToken != null) {
+            // 如果 Redis 中已存在相同的 Access Token，則直接返回該 Access Token
+            return storedAccessToken;
+        }
 
         // 生成 Access Token
         String accessToken = Jwts.builder()
@@ -65,8 +74,8 @@ public class MemberRestController {
                 .compact();
 
         // 存儲到Redis中
-        String redisKey = "access_token:" + username;
         redisTemplate.opsForValue().set(redisKey, accessToken, expirationTime, TimeUnit.MILLISECONDS);
+        System.out.println("redisKey=" + redisTemplate.opsForValue().get(redisKey));
 
         return accessToken;
     }

@@ -38,7 +38,7 @@
                         // 登入成功，轉到登入中頁面
                         var accessToken = response;
                         // 使用 JavaScript 的方式導向另一個頁面
-                        window.location.href = '/demo/logged-in?account=' + username + '&accessToken=' + accessToken;
+                        window.location.href = '/demo/api/userinfo?accessToken=' + accessToken;
                     },
                     error: function(xhr, status, error) {
                         // 登入失敗，處理錯誤

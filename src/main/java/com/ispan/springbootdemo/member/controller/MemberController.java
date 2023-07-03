@@ -26,29 +26,31 @@ public class MemberController {
 	
 	
     //*****登入後轉址*****
-    @GetMapping("/logged-in")
-    public String loggedInPage(@RequestParam("account") String account,
-                               @RequestParam("accessToken") String accessToken,
-                               Model model) {
-        // 在這裡處理登入成功後的邏輯
-        // 你可以使用 account 和 accessToken 進行相應的操作，例如從資料庫中檢索更多用戶資訊
-        
-        // 將帳號和 Access Token 傳遞到 JSP 頁面以顯示登入資訊
-        model.addAttribute("account", account);
-        model.addAttribute("accessToken", accessToken);
-        
-        // 返回 JSP 頁面的名稱
-        return "/member/logged-in";
-    }
+//    @GetMapping("/logged-in")
+//    public String loggedInPage(@RequestParam("account") String account,
+//                               @RequestParam("accessToken") String accessToken,
+//                               Model model) {
+//        // 在這裡處理登入成功後的邏輯
+//        // 你可以使用 account 和 accessToken 進行相應的操作，例如從資料庫中檢索更多用戶資訊
+//        
+//        // 將帳號和 Access Token 傳遞到 JSP 頁面以顯示登入資訊
+//        model.addAttribute("account", account);
+//        model.addAttribute("accessToken", accessToken);
+//        
+//        // 返回 JSP 頁面的名稱
+//        return "/member/logged-in";
+//    }
     
-    //*****後踢前策略*****
+    //*****登出*****
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(@RequestParam("account") String account) {
-        System.out.println("account= " + account);
+    public ResponseEntity<String> logout(@RequestParam("account") String username) {
+        System.out.println("Log Out account :" + username);
         // 從Redis中刪除或標記Access Token為無效
-        String redisKey = "access_token:" + account;
+        String redisKey = "access_token:" + username;
+//        System.out.println("beforeDelete redisKey=" + redisTemplate.opsForValue().get(redisKey));
+
         redisTemplate.delete(redisKey); // 或者使用其他Redis指令進行標記
-        System.out.println("redisKey=" + redisKey);
+        System.out.println("Deleted redisKey=" + redisTemplate.opsForValue().get(redisKey));
         return ResponseEntity.ok("登出成功");
     }
     
