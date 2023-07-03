@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,8 +23,6 @@
 
                 var username = $('#username').val();
                 var password = $('#password').val();
-                // console.log('username:', username);
-                // console.log('password:', password);
 
                 var data = {
                     account: username,
@@ -37,12 +35,13 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function(response) {
-                        // 登入成功，處理回應
+                        // 登入成功，轉到登入中頁面
                         var accessToken = response;
-                        alert('登入成功！');
+                        // 使用 JavaScript 的方式導向另一個頁面
+                        window.location.href = '/demo/logged-in?account=' + username + '&accessToken=' + accessToken;
                     },
                     error: function(xhr, status, error) {
-                        //登入失敗，處理錯誤
+                        // 登入失敗，處理錯誤
                         var errorMessage = xhr.responseText;
                         alert('登入失敗！錯誤訊息：' + errorMessage);
                     }
