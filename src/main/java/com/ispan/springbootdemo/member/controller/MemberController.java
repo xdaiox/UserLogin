@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ispan.springbootdemo.member.dao.MemberRepository;
 import com.ispan.springbootdemo.member.model.Member;
@@ -29,7 +30,7 @@ public class MemberController {
     @GetMapping("/logged-in")
     public String loggedInPage(@RequestParam("account") String account,
                                @RequestParam("accessToken") String accessToken,
-                               Model model) {
+                               Model model,RedirectAttributes redirectAttributes) {
 
         // 從Redis中獲取存儲的accessToken
         String storedAccessToken = redisTemplate.opsForValue().get("access_token:" + account);
@@ -37,7 +38,12 @@ public class MemberController {
         // 比對傳遞的accessToken和存儲的accessToken
         if (storedAccessToken == null || !storedAccessToken.equals(accessToken)) {
             // 若不一致，回傳失效訊息並轉向登入頁面
+        	System.out.println("error\", \"已從其他地方登入");
+        	redirectAttributes.addFlashAttribute("error", "已從其他地方登入");
             return "redirect:/";
+//            String errorMessage = "已從其他地方登入";
+//            String encodedErrorMessage = URLEncoder.encode(errorMessage, "UTF-8");
+//            return "redirect:/?error=" + encodedErrorMessage;
         }
 
         // 將帳號和 Access Token 傳遞到 JSP 頁面以顯示登入資訊
