@@ -41,7 +41,7 @@ public class MemberRestController {
 
 		if (dbUser != null && dbUser.getPassword().equals(member.getPassword())) {
 			// 帳號密碼一致，回傳Access Token
-			String accessToken = generateAccessToken(member.getAccount());
+			String accessToken = generateAccessToken(member.getAccount(),member.getPassword());
 			return ResponseEntity.ok(accessToken);
 		} else {
 			// 帳號密碼不一致，回傳錯誤訊息
@@ -51,34 +51,34 @@ public class MemberRestController {
     
     
   //*****新增AccessToken並存到Redis*****
-    private String generateAccessToken(String username) {
+    private String generateAccessToken(String username, String password) {
         // 定義 JWT 的相關參數
-        String secretKey = "daio"; // 密鑰，請替換為你自己的密鑰
+        String secretKey = "your-secret-key"; // 密鑰，請替換為你自己的密鑰
         long expirationTime = 86400000; // Token 過期時間，這裡設定為一天 (24 小時)
-        
-        // 檢查 Redis 中是否存在相同的 Access Token
+
+        // 從 Redis 中獲取舊的 AccessToken
         String redisKey = "access_token:" + username;
-        String storedAccessToken = redisTemplate.opsForValue().get(redisKey);
+        String oldAccessToken = redisTemplate.opsForValue().get(redisKey);
         
-        if (storedAccessToken != null) {
-            // 如果 Redis 中已存在相同的 Access Token，則直接返回該 Access Token
-            return storedAccessToken;
+        // 驗證舊的 AccessToken 是否存在且與密碼一致
+        if (oldAccessToken != null && oldAccessToken.equals(password)) {
+            return oldAccessToken; // 若一致，返回舊的 AccessToken
+        } else {
+            // 若不一致或不存在，生成新的 AccessToken
+            String newAccessToken = Jwts.builder()
+                    .setSubject(username)
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                    .signWith(SignatureAlgorithm.HS512, secretKey)
+                    .compact();
+
+            // 將新的 AccessToken 存儲到 Redis 中
+            redisTemplate.opsForValue().set(redisKey, newAccessToken, expirationTime, TimeUnit.MILLISECONDS);
+
+            return newAccessToken;
         }
-
-        // 生成 Access Token
-        String accessToken = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
-                .compact();
-
-        // 存儲到Redis中
-        redisTemplate.opsForValue().set(redisKey, accessToken, expirationTime, TimeUnit.MILLISECONDS);
-        System.out.println("redisKey=" + redisTemplate.opsForValue().get(redisKey));
-
-        return accessToken;
     }
+
     
   
 
