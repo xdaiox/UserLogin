@@ -1,4 +1,9 @@
 # UserLoginDemo
+需要先在MySQL上建立名為t2的資料庫
+再啟動專案，專案啟動後會自動建置資料表account
+後再至資料表account中insert帳號及密碼
+
+
 用Spring Framework &amp; MyBatis &amp; MySQL &amp; RabbitMQ &amp; Redis 實作以下功能  
 1. 實作一個登入API，當帳號密碼與DB的一致時，Access Token，不一致時，回傳錯誤訊息，
 2. 將Access Token存進Redis，多重登入時使用後踢前的策略
